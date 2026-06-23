@@ -13,7 +13,7 @@
     --border:  #30363d;
     --text:    #e6edf3;
     --muted:   #7d8590;
-    --accent:  #b0e0e6;
+    --accent:  #355e3b;
     --radius:  10px;
   }
 
@@ -30,7 +30,7 @@
   header { text-align: center; margin-bottom: 28px; }
   header h1 {
     font-size: 2rem; font-weight: 800; letter-spacing: -0.03em;
-    background: linear-gradient(120deg, #e77c39, #d4553a);
+    background: linear-gradient(120deg, #355e3b, #d4553a);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   header p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
@@ -105,7 +105,7 @@
     background: var(--bg); border: 1px solid var(--border);
     border-radius: 8px; padding: 8px 12px; gap: 8px;
   }
-  .roster-row.pinned { border-color: #e77c3966; background: #1a100a; }
+  .roster-row.pinned { border-color: #355e3b66; background: #1a100a; }
   .roster-name { font-weight: 600; font-size: 0.88rem; }
   .roster-tags { margin-top: 2px; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
 
@@ -115,7 +115,7 @@
   }
   .pin-badge {
     font-size: 0.67rem; font-weight: 700; padding: 1px 7px;
-    border-radius: 4px; border: 1px solid #e77c3966;
+    border-radius: 4px; border: 1px solid #355e3b66;
     background: #1a100a; color: var(--accent);
   }
 
@@ -128,7 +128,7 @@
     cursor: pointer; max-width: 110px;
   }
   .pin-select:focus { outline: none; border-color: var(--accent); }
-  .pin-select.has-pin { border-color: #e77c3966; color: var(--accent); }
+  .pin-select.has-pin { border-color: #355e3b66; color: var(--accent); }
 
   /* settings */
   .settings-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -173,7 +173,7 @@
 <body>
 
 <header>
-  <h1>🏐 Volleyball Team Generator</h1>
+  <h1>Volleyball Team Generator</h1>
   <p>Add players, optionally pin them to a team, then generate</p>
 </header>
 
@@ -230,7 +230,7 @@ const POSITIONS = [
 ];
 
 const TEAM_PALETTE = [
-  { border: '#e77c39', title: '#fb923c' },
+  { border: '#355e3b', title: '#fb923c' },
   { border: '#818cf8', title: '#a5b4fc' },
   { border: '#34d399', title: '#6ee7b7' },
   { border: '#f87171', title: '#fca5a5' },
