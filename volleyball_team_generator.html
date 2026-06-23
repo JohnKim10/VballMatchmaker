@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🏐 Volleyball Team Generator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --border:  #30363d;
+    --text:    #e6edf3;
+    --muted:   #7d8590;
+    --accent:  #e77c39;
+    --radius:  10px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 {
+    font-size: 2rem; font-weight: 800; letter-spacing: -0.03em;
+    background: linear-gradient(120deg, #e77c39, #d4553a);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  header p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+  .layout {
+    max-width: 900px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  @media (max-width: 640px) { .layout { grid-template-columns: 1fr; } }
+  .full { grid-column: 1 / -1; }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px;
+  }
+  .panel-title {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--muted); margin-bottom: 14px;
+  }
+
+  /* inputs */
+  .input-row { display: flex; gap: 8px; }
+  input[type=text], input[type=number], select {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    padding: 8px 12px; font-size: 0.9rem;
+    transition: border-color 0.15s;
+  }
+  input[type=text]:focus, input[type=number]:focus, select:focus {
+    outline: none; border-color: var(--accent);
+  }
+  input[type=text] { flex: 1; }
+  input[type=number] { width: 64px; text-align: center; }
+  select { flex: 1; cursor: pointer; }
+  select option { background: #1c2128; }
+
+  /* position chips */
+  .pos-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .pos-chip {
+    padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--bg); font-size: 0.75rem; cursor: pointer;
+    user-select: none; transition: all 0.12s;
+  }
+  .pos-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .pos-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+  /* buttons */
+  .btn {
+    padding: 8px 16px; border-radius: 8px; border: none;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-orange { background: var(--accent); color: #fff; }
+  .btn-orange:hover { opacity: 0.85; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm { padding: 4px 10px; font-size: 0.72rem; border-radius: 6px; }
+  .btn-red { background: #3d1a1a; color: #f87171; border: 1px solid #5c2a2a; }
+  .btn-red:hover { background: #5c2a2a; }
+
+  /* roster */
+  .scroll-list {
+    display: flex; flex-direction: column; gap: 6px;
+    max-height: 280px; overflow-y: auto;
+  }
+  .scroll-list::-webkit-scrollbar { width: 4px; }
+  .scroll-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .roster-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; gap: 8px;
+  }
+  .roster-row.pinned { border-color: #e77c3966; background: #1a100a; }
+  .roster-name { font-weight: 600; font-size: 0.88rem; }
+  .roster-tags { margin-top: 2px; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+
+  .tag {
+    font-size: 0.67rem; font-weight: 700;
+    padding: 1px 6px; border-radius: 4px; border: 1px solid;
+  }
+  .pin-badge {
+    font-size: 0.67rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 4px; border: 1px solid #e77c3966;
+    background: #1a100a; color: var(--accent);
+  }
+
+  .row-actions { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
+
+  /* pin select inside roster row */
+  .pin-select {
+    padding: 3px 6px; font-size: 0.72rem; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+    cursor: pointer; max-width: 110px;
+  }
+  .pin-select:focus { outline: none; border-color: var(--accent); }
+  .pin-select.has-pin { border-color: #e77c3966; color: var(--accent); }
+
+  /* settings */
+  .settings-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .settings-row label { font-size: 0.85rem; color: var(--muted); }
+
+  /* teams output */
+  .teams-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px; margin-top: 12px;
+  }
+  .team-box {
+    background: var(--bg); border-radius: var(--radius);
+    border: 2px solid; padding: 14px;
+  }
+  .team-heading {
+    font-weight: 700; font-size: 0.95rem; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .team-count { font-size: 0.72rem; font-weight: 400; color: var(--muted); }
+  .team-member-row { padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .team-member-row:last-child { border-bottom: none; }
+  .tm-name { font-size: 0.85rem; font-weight: 600; }
+  .tm-pos { margin-top: 2px; display: flex; gap: 4px; align-items: center; }
+  .tm-pinned { font-size: 0.65rem; color: var(--accent); }
+
+  .empty { text-align: center; color: var(--muted); font-size: 0.82rem; padding: 20px; }
+  .warning {
+    background: #2d1b00; border: 1px solid #7c4a00;
+    border-radius: 8px; padding: 10px 14px; color: #fbbf24;
+    font-size: 0.82rem; margin-top: 10px;
+  }
+  .count-badge {
+    display: inline-block; background: var(--accent); color: #fff;
+    font-size: 0.7rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 10px; margin-left: 6px;
+  }
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+  .generate-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .hint { font-size: 0.75rem; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏐 Volleyball Team Generator</h1>
+  <p>Add players, optionally pin them to a team, then generate</p>
+</header>
+
+<div class="layout">
+
+  <!-- Add Player -->
+  <div class="panel">
+    <div class="panel-title">Add Player</div>
+    <div class="input-row">
+      <input type="text" id="playerName" placeholder="Player name…" onkeydown="if(event.key==='Enter')addPlayer()" />
+      <button class="btn btn-orange" onclick="addPlayer()">+ Add</button>
+    </div>
+    <div class="pos-grid" id="posChips"></div>
+  </div>
+
+  <!-- Roster -->
+  <div class="panel">
+    <div class="panel-title">Roster <span id="countBadge" class="count-badge">0</span></div>
+    <div class="scroll-list" id="rosterList">
+      <div class="empty">No players yet — add some!</div>
+    </div>
+    <div class="hint" id="rosterHint" style="display:none">
+      📌 Use the dropdown on each player to pin them to a specific team.
+    </div>
+  </div>
+
+  <!-- Settings & Generate -->
+  <div class="panel full">
+    <div class="panel-title">Generate Teams</div>
+    <div class="settings-row">
+      <label>Number of teams</label>
+      <input type="number" id="numTeams" value="2" min="2" max="10" onchange="syncTeamCount()" />
+      <div class="generate-row">
+        <button class="btn btn-orange" onclick="generateTeams()">🎲 Generate</button>
+        <button class="btn btn-ghost" onclick="generateTeams()">🔀 Re-randomize</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearTeams()">Clear</button>
+      </div>
+    </div>
+    <div id="warningMsg"></div>
+    <div id="teamsOutput"></div>
+  </div>
+
+</div>
+
+<script>
+const POSITIONS = [
+  { id: 'S',   label: 'Setter',          short: 'S',   color: '#818cf8', bg: '#1e1b4b' },
+  { id: 'OH',  label: 'Outside Hitter',  short: 'OH',  color: '#fbbf24', bg: '#1c1400' },
+  { id: 'MH',  label: 'Middle Hitter',   short: 'MH',  color: '#34d399', bg: '#022c22' },
+  { id: 'OPP', label: 'Opposite',        short: 'OPP', color: '#f87171', bg: '#2d0a0a' },
+  { id: 'L',   label: 'Libero',          short: 'L',   color: '#22d3ee', bg: '#001f2d' },
+  { id: 'DS',  label: 'Def. Specialist', short: 'DS',  color: '#c084fc', bg: '#1a0030' },
+  { id: 'RS',  label: 'Right Side',      short: 'RS',  color: '#fb923c', bg: '#1c0900' },
+];
+
+const TEAM_PALETTE = [
+  { border: '#e77c39', title: '#fb923c' },
+  { border: '#818cf8', title: '#a5b4fc' },
+  { border: '#34d399', title: '#6ee7b7' },
+  { border: '#f87171', title: '#fca5a5' },
+  { border: '#22d3ee', title: '#67e8f9' },
+  { border: '#c084fc', title: '#d8b4fe' },
+  { border: '#fbbf24', title: '#fde68a' },
+  { border: '#f472b6', title: '#f9a8d4' },
+];
+
+let players = [];
+let selectedPos = new Set();
+let numTeams = 2;
+
+/* ── Position chips ── */
+const chipsEl = document.getElementById('posChips');
+POSITIONS.forEach(p => {
+  const chip = document.createElement('div');
+  chip.className = 'pos-chip';
+  chip.id = `chip-${p.id}`;
+  chip.textContent = p.label;
+  chip.onclick = () => togglePos(p.id, chip);
+  chipsEl.appendChild(chip);
+});
+
+function togglePos(id, chipEl) {
+  if (selectedPos.has(id)) { selectedPos.delete(id); chipEl.classList.remove('active'); }
+  else { selectedPos.add(id); chipEl.classList.add('active'); }
+}
+
+/* ── Sync team count ── */
+function syncTeamCount() {
+  numTeams = Math.max(2, Math.min(10, parseInt(document.getElementById('numTeams').value) || 2));
+  // Unpin any players pinned to a team number that no longer exists
+  players.forEach(p => { if (p.pinnedTo !== null && p.pinnedTo >= numTeams) p.pinnedTo = null; });
+  renderRoster();
+}
+
+/* ── Add player ── */
+function addPlayer() {
+  const nameEl = document.getElementById('playerName');
+  const name = nameEl.value.trim();
+  if (!name) { nameEl.focus(); return; }
+  if (selectedPos.size === 0) { alert('Select at least one position!'); return; }
+
+  players.push({ id: Date.now(), name, positions: [...selectedPos], pinnedTo: null });
+
+  nameEl.value = '';
+  selectedPos.clear();
+  document.querySelectorAll('.pos-chip').forEach(c => c.classList.remove('active'));
+  nameEl.focus();
+  renderRoster();
+}
+
+function removePlayer(id) {
+  players = players.filter(p => p.id !== id);
+  renderRoster();
+}
+
+function pinPlayer(id, val) {
+  const p = players.find(p => p.id === id);
+  if (p) p.pinnedTo = val === '' ? null : parseInt(val);
+  renderRoster();
+}
+
+/* ── Render roster ── */
+function getPos(id) { return POSITIONS.find(p => p.id === id); }
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function teamOptions(currentPin) {
+  let opts = `<option value="">No pin</option>`;
+  for (let i = 0; i < numTeams; i++) {
+    opts += `<option value="${i}" ${currentPin === i ? 'selected' : ''}>Team ${i + 1}</option>`;
+  }
+  return opts;
+}
+
+function renderRoster() {
+  numTeams = Math.max(2, Math.min(10, parseInt(document.getElementById('numTeams').value) || 2));
+  document.getElementById('countBadge').textContent = players.length;
+  const list = document.getElementById('rosterList');
+  const hint = document.getElementById('rosterHint');
+  hint.style.display = players.length ? 'block' : 'none';
+
+  if (!players.length) {
+    list.innerHTML = '<div class="empty">No players yet — add some!</div>';
+    return;
+  }
+
+  list.innerHTML = players.map(p => {
+    const isPinned = p.pinnedTo !== null;
+    const col = isPinned ? TEAM_PALETTE[p.pinnedTo % TEAM_PALETTE.length] : null;
+    const pinLabel = isPinned
+      ? `<span class="pin-badge" style="border-color:${col.border}55;color:${col.title}">📌 Team ${p.pinnedTo + 1}</span>`
+      : '';
+
+    return `<div class="roster-row ${isPinned ? 'pinned' : ''}" style="${isPinned ? `border-color:${col.border}55` : ''}">
+      <div style="min-width:0;flex:1">
+        <div class="roster-name">${esc(p.name)}</div>
+        <div class="roster-tags">
+          ${p.positions.map(pid => {
+            const pos = getPos(pid);
+            return `<span class="tag" style="color:${pos.color};background:${pos.bg};border-color:${pos.color}30">${pos.short}</span>`;
+          }).join('')}
+          ${pinLabel}
+        </div>
+      </div>
+      <div class="row-actions">
+        <select class="pin-select ${isPinned ? 'has-pin' : ''}" onchange="pinPlayer(${p.id}, this.value)">
+          ${teamOptions(p.pinnedTo)}
+        </select>
+        <button class="btn btn-red btn-sm" onclick="removePlayer(${p.id})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Generate ── */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function generateTeams() {
+  numTeams = Math.max(2, Math.min(10, parseInt(document.getElementById('numTeams').value) || 2));
+  const warnEl = document.getElementById('warningMsg');
+  warnEl.innerHTML = '';
+
+  if (players.length < numTeams) {
+    warnEl.innerHTML = `<div class="warning">⚠️ Need at least ${numTeams} players for ${numTeams} teams. You have ${players.length}.</div>`;
+    document.getElementById('teamsOutput').innerHTML = '';
+    return;
+  }
+
+  // Validate: check no team is over-pinned vs total capacity
+  const pinCounts = Array(numTeams).fill(0);
+  players.forEach(p => { if (p.pinnedTo !== null) pinCounts[p.pinnedTo]++; });
+  const floorSize = Math.floor(players.length / numTeams);
+  const overloaded = pinCounts.findIndex(c => c > Math.ceil(players.length / numTeams));
+  if (overloaded !== -1) {
+    warnEl.innerHTML = `<div class="warning">⚠️ Team ${overloaded + 1} has too many pinned players for a balanced draw. Try unpinning some.</div>`;
+  }
+
+  // Separate pinned vs free players
+  const teams = Array.from({ length: numTeams }, (_, i) => ({ idx: i, members: [] }));
+  const pinned = players.filter(p => p.pinnedTo !== null);
+  const free = players.filter(p => p.pinnedTo === null);
+
+  // Place pinned players first
+  pinned.forEach(p => {
+    teams[p.pinnedTo].members.push({ ...p, assignedPos: pickPrimary(p), wasPinned: true });
+  });
+
+  // Smart-distribute free players: position-rarity sort, then round-robin
+  // filling smallest teams first
+  const posCount = {};
+  POSITIONS.forEach(p => posCount[p.id] = 0);
+  players.forEach(p => p.positions.forEach(pid => posCount[pid]++));
+
+  const scored = shuffle(free).map(player => ({
+    player,
+    primary: pickPrimary(player),
+    rarity: Math.min(...player.positions.map(pid => posCount[pid]))
+  })).sort((a, b) => a.rarity - b.rarity);
+
+  scored.forEach(({ player, primary }) => {
+    // Find the team with the fewest members (among those NOT over-capacity)
+    const target = teams.reduce((best, t) => t.members.length < best.members.length ? t : best);
+    target.members.push({ ...player, assignedPos: primary, wasPinned: false });
+  });
+
+  renderTeams(teams);
+}
+
+function pickPrimary(player) {
+  // Pick rarest position across full roster
+  const posCount = {};
+  POSITIONS.forEach(p => posCount[p.id] = 0);
+  players.forEach(p => p.positions.forEach(pid => posCount[pid]++));
+  return player.positions.reduce((a, b) => posCount[a] < posCount[b] ? a : b);
+}
+
+function renderTeams(teams) {
+  const out = document.getElementById('teamsOutput');
+
+  const boxes = teams.map((team, i) => {
+    const col = TEAM_PALETTE[i % TEAM_PALETTE.length];
+    const rows = team.members.map(m => {
+      const pos = getPos(m.assignedPos);
+      const extra = m.positions.length > 1
+        ? `<span style="color:var(--muted);font-size:0.67rem">+${m.positions.length - 1}</span>` : '';
+      const pinIcon = m.wasPinned ? `<span class="tm-pinned">📌</span>` : '';
+      return `<div class="team-member-row">
+        <div class="tm-name">${esc(m.name)} ${pinIcon}</div>
+        <div class="tm-pos">
+          <span class="tag" style="color:${pos.color};background:${pos.bg};border-color:${pos.color}30">${pos.short}</span>
+          ${extra}
+        </div>
+      </div>`;
+    }).join('');
+
+    const pinnedCount = team.members.filter(m => m.wasPinned).length;
+    const pinnedNote = pinnedCount ? `<span style="font-size:0.67rem;color:var(--muted)"> · ${pinnedCount} pinned</span>` : '';
+
+    return `<div class="team-box" style="border-color:${col.border}">
+      <div class="team-heading" style="color:${col.title}">
+        Team ${i + 1}
+        <span class="team-count">${team.members.length} players${pinnedNote}</span>
+      </div>
+      ${rows || '<div class="empty">No players</div>'}
+    </div>`;
+  }).join('');
+
+  out.innerHTML = `<div class="divider"></div><div class="teams-grid">${boxes}</div>`;
+}
+
+function clearTeams() {
+  document.getElementById('teamsOutput').innerHTML = '';
+  document.getElementById('warningMsg').innerHTML = '';
+}
+</script>
+</body>
+</html>
