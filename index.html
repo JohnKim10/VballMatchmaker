@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Volleyball Team Generator</title>
+<title>🏐 Volleyball Team Generator</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,7 +13,8 @@
     --border:  #30363d;
     --text:    #e6edf3;
     --muted:   #7d8590;
-    --accent:  #355e3b;
+    --accent:  #3a7d44;
+    --accent2: #2d6235;
     --radius:  10px;
   }
 
@@ -30,7 +31,7 @@
   header { text-align: center; margin-bottom: 28px; }
   header h1 {
     font-size: 2rem; font-weight: 800; letter-spacing: -0.03em;
-    background: linear-gradient(120deg, #355e3b, #006400);
+    background: linear-gradient(120deg, #4a9e58, #2d6235);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   header p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
@@ -84,8 +85,8 @@
     transition: opacity 0.15s, transform 0.1s; white-space: nowrap;
   }
   .btn:active { transform: scale(0.97); }
-  .btn-orange { background: var(--accent); color: #fff; }
-  .btn-orange:hover { opacity: 0.85; }
+  .btn-green { background: var(--accent); color: #fff; }
+  .btn-green:hover { background: var(--accent2); }
   .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
   .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
   .btn-sm { padding: 4px 10px; font-size: 0.72rem; border-radius: 6px; }
@@ -105,7 +106,7 @@
     background: var(--bg); border: 1px solid var(--border);
     border-radius: 8px; padding: 8px 12px; gap: 8px;
   }
-  .roster-row.pinned { border-color: #355e3b66; background: #1a100a; }
+  .roster-row.pinned { background: #091a0c; }
   .roster-name { font-weight: 600; font-size: 0.88rem; }
   .roster-tags { margin-top: 2px; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
 
@@ -115,24 +116,32 @@
   }
   .pin-badge {
     font-size: 0.67rem; font-weight: 700; padding: 1px 7px;
-    border-radius: 4px; border: 1px solid #355e3b66;
-    background: #1a100a; color: var(--accent);
+    border-radius: 4px; border: 1px solid;
+    background: #0e1a0d; color: var(--accent);
   }
 
   .row-actions { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
 
-  /* pin select inside roster row */
   .pin-select {
     padding: 3px 6px; font-size: 0.72rem; border-radius: 6px;
     border: 1px solid var(--border); background: var(--bg); color: var(--muted);
     cursor: pointer; max-width: 110px;
   }
   .pin-select:focus { outline: none; border-color: var(--accent); }
-  .pin-select.has-pin { border-color: #355e3b66; color: var(--accent); }
+  .pin-select.has-pin { border-color: #5a7a5266; color: var(--accent); }
 
   /* settings */
   .settings-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .settings-row label { font-size: 0.85rem; color: var(--muted); }
+
+  /* quota info */
+  .quota-info {
+    margin-top: 12px; padding: 10px 14px;
+    background: #0e1a0d; border: 1px solid #2a3f28;
+    border-radius: 8px; font-size: 0.78rem; color: #8aad82;
+    line-height: 1.6;
+  }
+  .quota-info strong { color: #a8c9a0; }
 
   /* teams output */
   .teams-grid {
@@ -151,7 +160,7 @@
   .team-member-row { padding: 6px 0; border-bottom: 1px solid var(--border); }
   .team-member-row:last-child { border-bottom: none; }
   .tm-name { font-size: 0.85rem; font-weight: 600; }
-  .tm-pos { margin-top: 2px; display: flex; gap: 4px; align-items: center; }
+  .tm-pos { margin-top: 2px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
   .tm-pinned { font-size: 0.65rem; color: var(--accent); }
 
   .empty { text-align: center; color: var(--muted); font-size: 0.82rem; padding: 20px; }
@@ -160,6 +169,7 @@
     border-radius: 8px; padding: 10px 14px; color: #fbbf24;
     font-size: 0.82rem; margin-top: 10px;
   }
+  .warning + .warning { margin-top: 6px; }
   .count-badge {
     display: inline-block; background: var(--accent); color: #fff;
     font-size: 0.7rem; font-weight: 700; padding: 1px 7px;
@@ -168,12 +178,58 @@
   .divider { height: 1px; background: var(--border); margin: 14px 0; }
   .generate-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .hint { font-size: 0.75rem; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+  /* quota editor */
+  .quota-editor {
+    margin-top: 14px; padding: 14px;
+    background: #091a0c; border: 1px solid #1e3d22;
+    border-radius: 8px;
+  }
+  .quota-editor-title {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #6ab878; margin-bottom: 12px;
+  }
+  .quota-rows { display: flex; flex-direction: column; gap: 8px; }
+  .quota-row {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .quota-pos-label {
+    display: flex; align-items: center; gap: 6px;
+    min-width: 150px; font-size: 0.82rem;
+  }
+  .quota-stepper {
+    display: flex; align-items: center; gap: 0;
+    border: 1px solid var(--border); border-radius: 7px; overflow: hidden;
+  }
+  .quota-stepper button {
+    width: 30px; height: 28px; border: none; background: var(--bg);
+    color: var(--muted); font-size: 1rem; cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .quota-stepper button:hover { background: #0f2e14; color: var(--accent); }
+  .quota-stepper .quota-val {
+    width: 34px; text-align: center; font-size: 0.9rem;
+    font-weight: 700; color: var(--text); background: var(--bg);
+    border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+    height: 28px; line-height: 28px; user-select: none;
+  }
+  .quota-note { font-size: 0.72rem; color: var(--muted); margin-left: 4px; }
+
+  /* position quota badges in team header */
+  .pos-quota-row { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+  .quota-chip {
+    font-size: 0.65rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 4px; border: 1px solid;
+  }
+  .quota-chip.met { opacity: 1; }
+  .quota-chip.unmet { opacity: 0.35; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Volleyball Team Generator</h1>
+  <h1>🏐 Volleyball Team Generator</h1>
   <p>Add players, optionally pin them to a team, then generate</p>
 </header>
 
@@ -184,7 +240,7 @@
     <div class="panel-title">Add Player</div>
     <div class="input-row">
       <input type="text" id="playerName" placeholder="Player name…" onkeydown="if(event.key==='Enter')addPlayer()" />
-      <button class="btn btn-orange" onclick="addPlayer()">+ Add</button>
+      <button class="btn btn-green" onclick="addPlayer()">+ Add</button>
     </div>
     <div class="pos-grid" id="posChips"></div>
   </div>
@@ -207,11 +263,12 @@
       <label>Number of teams</label>
       <input type="number" id="numTeams" value="2" min="2" max="10" onchange="syncTeamCount()" />
       <div class="generate-row">
-        <button class="btn btn-orange" onclick="generateTeams()">🎲 Generate</button>
+        <button class="btn btn-green" onclick="generateTeams()">🎲 Generate</button>
         <button class="btn btn-ghost" onclick="generateTeams()">🔀 Re-randomize</button>
         <button class="btn btn-ghost btn-sm" onclick="clearTeams()">Clear</button>
       </div>
     </div>
+    <div class="quota-editor" id="quotaEditor"></div>
     <div id="warningMsg"></div>
     <div id="teamsOutput"></div>
   </div>
@@ -220,23 +277,24 @@
 
 <script>
 const POSITIONS = [
-  { id: 'S',   label: 'Setter',          short: 'S',   color: '#818cf8', bg: '#1e1b4b' },
-  { id: 'OH',  label: 'Outside Hitter',  short: 'OH',  color: '#fbbf24', bg: '#1c1400' },
-  { id: 'MH',  label: 'Middle Hitter',   short: 'MH',  color: '#34d399', bg: '#022c22' },
-  { id: 'OPP', label: 'Opposite',        short: 'OPP', color: '#f87171', bg: '#2d0a0a' },
-  { id: 'L',   label: 'Libero',          short: 'L',   color: '#22d3ee', bg: '#001f2d' },
-  { id: 'DS',  label: 'Def. Specialist', short: 'DS',  color: '#c084fc', bg: '#1a0030' },
-  { id: 'RS',  label: 'Right Side',      short: 'RS',  color: '#fb923c', bg: '#1c0900' },
+  { id: 'S',   label: 'Setter',         short: 'S',   color: '#818cf8', bg: '#1e1b4b' },
+  { id: 'OH',  label: 'Outside Hitter', short: 'OH',  color: '#fbbf24', bg: '#1c1400' },
+  { id: 'MH',  label: 'Middle Hitter',  short: 'MH',  color: '#34d399', bg: '#022c22' },
+  { id: 'OPP', label: 'Opposite',       short: 'OPP', color: '#f87171', bg: '#2d0a0a' },
+  { id: 'L',   label: 'Libero',         short: 'L',   color: '#22d3ee', bg: '#001f2d' },
 ];
 
+// Target slots per team per position (minimum) — editable
+let QUOTAS = { S: 1, OH: 2, MH: 2, OPP: 1, L: 0 };
+
 const TEAM_PALETTE = [
-  { border: '#355e3b', title: '#fb923c' },
+  { border: '#3a7d44', title: '#5aad68' },
   { border: '#818cf8', title: '#a5b4fc' },
-  { border: '#34d399', title: '#6ee7b7' },
   { border: '#f87171', title: '#fca5a5' },
+  { border: '#fbbf24', title: '#fde68a' },
   { border: '#22d3ee', title: '#67e8f9' },
   { border: '#c084fc', title: '#d8b4fe' },
-  { border: '#fbbf24', title: '#fde68a' },
+  { border: '#fb923c', title: '#fdba74' },
   { border: '#f472b6', title: '#f9a8d4' },
 ];
 
@@ -260,10 +318,38 @@ function togglePos(id, chipEl) {
   else { selectedPos.add(id); chipEl.classList.add('active'); }
 }
 
-/* ── Sync team count ── */
+/* ── Quota editor ── */
+function renderQuotaEditor() {
+  const el = document.getElementById('quotaEditor');
+  el.innerHTML = `
+    <div class="quota-editor-title">Position targets per team</div>
+    <div class="quota-rows">
+      ${POSITIONS.map(p => `
+        <div class="quota-row">
+          <div class="quota-pos-label">
+            <span class="tag" style="color:${p.color};background:${p.bg};border-color:${p.color}30">${p.short}</span>
+            <span style="font-size:0.82rem">${p.label}</span>
+          </div>
+          <div class="quota-stepper">
+            <button onclick="adjustQuota('${p.id}', -1)">−</button>
+            <div class="quota-val" id="qval-${p.id}">${QUOTAS[p.id]}</div>
+            <button onclick="adjustQuota('${p.id}', 1)">+</button>
+          </div>
+          <span class="quota-note">${QUOTAS[p.id] === 0 ? 'not required' : `× ${QUOTAS[p.id]} per team`}</span>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+function adjustQuota(posId, delta) {
+  QUOTAS[posId] = Math.max(0, Math.min(6, (QUOTAS[posId] || 0) + delta));
+  renderQuotaEditor();
+}
+
+renderQuotaEditor();
+
 function syncTeamCount() {
   numTeams = Math.max(2, Math.min(10, parseInt(document.getElementById('numTeams').value) || 2));
-  // Unpin any players pinned to a team number that no longer exists
   players.forEach(p => { if (p.pinnedTo !== null && p.pinnedTo >= numTeams) p.pinnedTo = null; });
   renderRoster();
 }
@@ -274,9 +360,7 @@ function addPlayer() {
   const name = nameEl.value.trim();
   if (!name) { nameEl.focus(); return; }
   if (selectedPos.size === 0) { alert('Select at least one position!'); return; }
-
   players.push({ id: Date.now(), name, positions: [...selectedPos], pinnedTo: null });
-
   nameEl.value = '';
   selectedPos.clear();
   document.querySelectorAll('.pos-chip').forEach(c => c.classList.remove('active'));
@@ -295,12 +379,8 @@ function pinPlayer(id, val) {
   renderRoster();
 }
 
-/* ── Render roster ── */
 function getPos(id) { return POSITIONS.find(p => p.id === id); }
-
-function esc(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function teamOptions(currentPin) {
   let opts = `<option value="">No pin</option>`;
@@ -328,7 +408,6 @@ function renderRoster() {
     const pinLabel = isPinned
       ? `<span class="pin-badge" style="border-color:${col.border}55;color:${col.title}">📌 Team ${p.pinnedTo + 1}</span>`
       : '';
-
     return `<div class="roster-row ${isPinned ? 'pinned' : ''}" style="${isPinned ? `border-color:${col.border}55` : ''}">
       <div style="min-width:0;flex:1">
         <div class="roster-name">${esc(p.name)}</div>
@@ -360,10 +439,15 @@ function shuffle(arr) {
   return a;
 }
 
+function canPlayPos(player, posId) {
+  return player.positions.includes(posId);
+}
+
 function generateTeams() {
   numTeams = Math.max(2, Math.min(10, parseInt(document.getElementById('numTeams').value) || 2));
   const warnEl = document.getElementById('warningMsg');
   warnEl.innerHTML = '';
+  const warnings = [];
 
   if (players.length < numTeams) {
     warnEl.innerHTML = `<div class="warning">⚠️ Need at least ${numTeams} players for ${numTeams} teams. You have ${players.length}.</div>`;
@@ -371,52 +455,91 @@ function generateTeams() {
     return;
   }
 
-  // Validate: check no team is over-pinned vs total capacity
-  const pinCounts = Array(numTeams).fill(0);
-  players.forEach(p => { if (p.pinnedTo !== null) pinCounts[p.pinnedTo]++; });
-  const floorSize = Math.floor(players.length / numTeams);
-  const overloaded = pinCounts.findIndex(c => c > Math.ceil(players.length / numTeams));
-  if (overloaded !== -1) {
-    warnEl.innerHTML = `<div class="warning">⚠️ Team ${overloaded + 1} has too many pinned players for a balanced draw. Try unpinning some.</div>`;
+  // Build team slots
+  // Each team has a quota map tracking how many more of each pos it still needs
+  const teams = Array.from({ length: numTeams }, (_, i) => ({
+    idx: i,
+    members: [],
+    need: { ...QUOTAS }  // slots still needed per position
+  }));
+
+  // Place pinned players first, updating need counts
+  const pinned = players.filter(p => p.pinnedTo !== null);
+  const free = shuffle(players.filter(p => p.pinnedTo === null));
+
+  pinned.forEach(p => {
+    const team = teams[p.pinnedTo];
+    // figure out which quota slot this player fills (pick highest-priority unmet need)
+    const filledPos = fillBestSlot(team, p);
+    team.members.push({ ...p, assignedPos: filledPos, wasPinned: true });
+  });
+
+  // Now fill free players using a quota-aware greedy approach:
+  // Priority order of positions to fill
+  const FILL_ORDER = ['S', 'OH', 'MH', 'OPP', 'L'];
+
+  // For each position in priority order, assign players who can play it to teams that still need it
+  const assigned = new Set();
+
+  for (const posId of FILL_ORDER) {
+    // Teams that still need this position, sorted by how many they need (desc)
+    const eligible = free.filter(p => !assigned.has(p.id) && canPlayPos(p, posId));
+    const shuffledEligible = shuffle(eligible);
+
+    for (const player of shuffledEligible) {
+      // Find team that needs this pos most and has fewest members
+      const needy = teams
+        .filter(t => (t.need[posId] || 0) > 0)
+        .sort((a, b) => {
+          const needDiff = (b.need[posId] || 0) - (a.need[posId] || 0);
+          return needDiff !== 0 ? needDiff : a.members.length - b.members.length;
+        });
+
+      if (needy.length > 0) {
+        const team = needy[0];
+        team.need[posId] = Math.max(0, (team.need[posId] || 0) - 1);
+        team.members.push({ ...player, assignedPos: posId, wasPinned: false });
+        assigned.add(player.id);
+      }
+    }
   }
 
-  // Separate pinned vs free players
-  const teams = Array.from({ length: numTeams }, (_, i) => ({ idx: i, members: [] }));
-  const pinned = players.filter(p => p.pinnedTo !== null);
-  const free = players.filter(p => p.pinnedTo === null);
-
-  // Place pinned players first
-  pinned.forEach(p => {
-    teams[p.pinnedTo].members.push({ ...p, assignedPos: pickPrimary(p), wasPinned: true });
-  });
-
-  // Smart-distribute free players: position-rarity sort, then round-robin
-  // filling smallest teams first
-  const posCount = {};
-  POSITIONS.forEach(p => posCount[p.id] = 0);
-  players.forEach(p => p.positions.forEach(pid => posCount[pid]++));
-
-  const scored = shuffle(free).map(player => ({
-    player,
-    primary: pickPrimary(player),
-    rarity: Math.min(...player.positions.map(pid => posCount[pid]))
-  })).sort((a, b) => a.rarity - b.rarity);
-
-  scored.forEach(({ player, primary }) => {
-    // Find the team with the fewest members (among those NOT over-capacity)
+  // Remaining unassigned players — place on smallest teams
+  const remaining = free.filter(p => !assigned.has(p.id));
+  remaining.forEach(player => {
     const target = teams.reduce((best, t) => t.members.length < best.members.length ? t : best);
-    target.members.push({ ...player, assignedPos: primary, wasPinned: false });
+    const filledPos = fillBestSlot(target, player);
+    target.members.push({ ...player, assignedPos: filledPos, wasPinned: false });
+    assigned.add(player.id);
   });
+
+  // Warn about unmet quotas
+  teams.forEach((team, i) => {
+    const unmet = Object.entries(team.need)
+      .filter(([pos, count]) => count > 0 && QUOTAS[pos] > 0)
+      .map(([pos, count]) => `${count}× ${getPos(pos)?.label || pos}`);
+    if (unmet.length) {
+      warnings.push(`⚠️ Team ${i + 1} is short: ${unmet.join(', ')} — not enough eligible players in roster.`);
+    }
+  });
+
+  if (warnings.length) {
+    warnEl.innerHTML = warnings.map(w => `<div class="warning">${w}</div>`).join('');
+  }
 
   renderTeams(teams);
 }
 
-function pickPrimary(player) {
-  // Pick rarest position across full roster
-  const posCount = {};
-  POSITIONS.forEach(p => posCount[p.id] = 0);
-  players.forEach(p => p.positions.forEach(pid => posCount[pid]++));
-  return player.positions.reduce((a, b) => posCount[a] < posCount[b] ? a : b);
+function fillBestSlot(team, player) {
+  // Among positions the player can play, prefer ones the team still needs
+  const needed = player.positions.filter(pid => (team.need[pid] || 0) > 0);
+  if (needed.length) {
+    // Pick the one with the highest remaining need
+    const best = needed.reduce((a, b) => (team.need[b] || 0) > (team.need[a] || 0) ? b : a);
+    team.need[best] = Math.max(0, (team.need[best] || 0) - 1);
+    return best;
+  }
+  return player.positions[0];
 }
 
 function renderTeams(teams) {
@@ -424,17 +547,28 @@ function renderTeams(teams) {
 
   const boxes = teams.map((team, i) => {
     const col = TEAM_PALETTE[i % TEAM_PALETTE.length];
+
+    // Build quota summary chips
+    const quotaChips = Object.entries(QUOTAS)
+      .filter(([, count]) => count > 0)
+      .map(([posId, required]) => {
+        const pos = getPos(posId);
+        const actual = team.members.filter(m => m.assignedPos === posId).length;
+        const met = actual >= required;
+        return `<span class="quota-chip ${met ? 'met' : 'unmet'}" style="color:${pos.color};background:${pos.bg};border-color:${pos.color}40">
+          ${pos.short} ${actual}/${required}
+        </span>`;
+      }).join('');
+
     const rows = team.members.map(m => {
-      const pos = getPos(m.assignedPos);
-      const extra = m.positions.length > 1
-        ? `<span style="color:var(--muted);font-size:0.67rem">+${m.positions.length - 1}</span>` : '';
       const pinIcon = m.wasPinned ? `<span class="tm-pinned">📌</span>` : '';
+      const allTags = m.positions.map(pid => {
+        const pos = getPos(pid);
+        return `<span class="tag" style="color:${pos.color};background:${pos.bg};border-color:${pos.color}30">${pos.short}</span>`;
+      }).join('');
       return `<div class="team-member-row">
         <div class="tm-name">${esc(m.name)} ${pinIcon}</div>
-        <div class="tm-pos">
-          <span class="tag" style="color:${pos.color};background:${pos.bg};border-color:${pos.color}30">${pos.short}</span>
-          ${extra}
-        </div>
+        <div class="tm-pos">${allTags}</div>
       </div>`;
     }).join('');
 
@@ -446,6 +580,7 @@ function renderTeams(teams) {
         Team ${i + 1}
         <span class="team-count">${team.members.length} players${pinnedNote}</span>
       </div>
+      <div class="pos-quota-row">${quotaChips}</div>
       ${rows || '<div class="empty">No players</div>'}
     </div>`;
   }).join('');
